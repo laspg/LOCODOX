@@ -1,0 +1,86 @@
+2020/10/09: Test de modif G. Maze
+
+
+Mofifications from 3.3:
+
+Bugs found by Virginie Thierry
+DOXY_corr_prepare.m
+
+Symbolic link Added by T. Reynaud
+ln -s DOXY_corr_main.m locodox.m 
+
+We add the M_MAP Library instead of GOOGLE_MAP
+(no internet access required)
+doxy_corr/DOXY_MAP2.m 
+share/read_bathy2006.m created by T. Reynaud for reading etopo2 bottom topography
+data_input/ETOPO2v2c_f4.nc
+
+DOXY_config.m:
+add the following lines: in DOXY_config.m
+
+% -------------------------------------------------------------------------
+% M_MAP INFORMATION
+% -------------------------------------------------------------------------
+% Added by Thierry Reynaud 06/02/2020
+% The M_MAP Library is introduced to replace Google Plot Maps which required internet.
+% The M_MAP path is defined here:
+CONFIG.M_MAP_ACTIVE=1; % set to 0 ==> google_map plots
+CONFIG.M_MAP_PATH='/Users/thierry_reynaud/IFREMER/MATLAB/m_map1.4h';
+CONFIG.M_MAP_PLOT_BATHY=1;% PLOTTING ==> Reading ETOPO2 File
+
+% WOA_YEAR + WOA_DECAD added by TR 31.03.2020
+WOA_YEAR='2018';% Release Year
+WOA_DECAD='_DECAV';% Only for woa2018 : period choice DECAV versus A5B7
+CONFIG.history_reference = ['LOPS2018_WOA',WOA_YEAR];
+
+% M_MAP updated by TR 02.04.2020
+CONFIG.M_MAP_PATH='/Users/thierry_reynaud/IFREMER/MATLAB/m_map1.4m';
+
+% Miller projection used instead of mercator
+% in DOXY_MAP2 by TR 02.04.2020
+m_proj('miller','long',[xlim(1) xlim(2)], ...
+    'lati',[ylim(1) ylim(2)]);
+
+% Modifications TR 09.04.2020 in DOXY_config.m
+mmp = fullfile(CONFIG.LocodoxMainDir,'share','m_map1.4m',filesep);
+CONFIG.M_MAP_PATH=mmp;
+
+% Add the useful paths
+mytools = fullfile(CONFIG.LocodoxMainDir,'share','MyTools',filesep);
+addpath(mytools);
+
+woa_pth=fullfile(CONFIG.LocodoxMainDir,'data_input','WOA',filesep);
+addpath(woa_pth);
+
+Update DOXY_corr_main.m with the recent version modified by T. Reynaud
+doxy_corr/DOXY_PLOT_interpolation.m   .....> see savefile
+doxy_corr/DOXY_ref_corr.m             .....> whichDrift for argoXStruct
+doxy_corr/DOXY_inair_corr.m           .....> whichDrift for argo4Struct
+doxy_corr/DOXY_woa_corr.m             .....> whichDrift for argoXStruct 
+doxy_corr/DOXY_PLOT_corr.m            .....> Work.whichDrift introduced
+
+% Modified by TR 09.04.2020
+mv share/*.m share/MyTools/.
+
+% Corrections 05.04.2020 by T. Reynaud
+% Purpose plot corrected oxy profiles for WOA and REF with or without REF Profile
+
+DOXY_corr_apply_main.m
+DOXY_PLOT_corr.m
+
+
+%10.04.2020
+
+DOXY_config.m ==> TR add 
+CONFIG.ncepGetYears = str2double(datestr(now,'YYYY'));% To be downloaded
+
+% Modified
+DOXY_NCEP_read.m % Download only the current year
+
+% Temporal ==> Time
+DOXY_update_fields.m
+DOXY_drift.m
+DOXY_corr_compute_main.m
+DOXY_PLOT_drift.m
+
+
