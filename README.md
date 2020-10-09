@@ -10,9 +10,9 @@ This is a software to validate Argo oxygen measurements.
 
 ## Dev. objectives
 
-## TEST GITHUB
+## New features
 
-## readme de la nouvelle branche
+The tool can now offer correction based on PPOX
 
 
 
