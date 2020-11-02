@@ -84,6 +84,12 @@
 %                               Supression of  range test, spike test, 
 %                               gradient test : quality control have to be
 %                               done before using locodox
+%              v3.4  02/11/2020 Virginie THIERRY, Ifremer
+%                               Add test on QC to move all QC flag = 3 to 1
+%                               before computing and applying the
+%                               correction
+%                               The patch is included while the bug on QC
+%                               selection is not found
 
 
 function [Swork,corrWork] = DOXY_QC(wmo,Sin,Swork,corrWork)
@@ -92,7 +98,16 @@ function [Swork,corrWork] = DOXY_QC(wmo,Sin,Swork,corrWork)
 % =========================================================================
 %% Initialize the QC array
 % =========================================================================
+for i=1:size(Sin.doxy_qc.data,1)
+    for j=1:size(Sin.doxy_qc.data,2)
+        if strcmp(Sin.doxy_qc.data(i,j),'3') == 1
+            Sin.doxy_qc.data(i,j)='1';
+        end
+    end
+end
+
 tabdoxyqc = Sin.doxy_qc.data;
+
 
 % =========================================================================
 %% Set of QC tests
