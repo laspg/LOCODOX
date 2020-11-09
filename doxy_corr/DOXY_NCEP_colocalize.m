@@ -134,7 +134,8 @@ enddate = ceil(max(juld)*4)/4; %--MG
 argo6h.juld = (startdate:1/4:enddate)';
 
 % keep nan values in memory
-idxnan = isnan(juld);
+%idxnan = isnan(juld); % Commented by T. Reynaud 06.11.2020
+idxnan = isnan(juld.*lat);% Filter date without positions
 
 % Interpolation over the argoTrajWork track, taking into account the new time grid
     % If any non unique values (example : repeated AET), add infinitesimal data
@@ -239,7 +240,7 @@ for i = 1:length(varNames)
     % the following lines attribute a linear weight in latitude and
     % longitude to the four corners surrounding the current interpolation
     % point. I made this to avoid a more time-consuming 2d bilinear
-    % interpolation, which wasn’t readymade in Matlab available.
+    % interpolation, which wasn???t readymade in Matlab available.
     wlat = 1 - abs(lat(ilat) - repmat(dataNcepOnArgo.(easyVar).lat,1,2))./...
         repmat(sum(abs(lat(ilat) - repmat(dataNcepOnArgo.(easyVar).lat,1,2)),2),1,2);
     wlon = 1 - abs(lon(ilon) - 360 - repmat(dataNcepOnArgo.(easyVar).lon,1,2))./...

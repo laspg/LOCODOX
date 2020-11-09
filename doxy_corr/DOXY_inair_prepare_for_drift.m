@@ -1,12 +1,12 @@
 % DOXY_inair_prepare_for_drift prepare data to compute drift on NCEP data (for WOA or REF correction)
 %
 % SYNTAX
-% [argo1Struct, argo2Struct, argo3Struct, argo4Struct, WOA,NCEP, Work,goProg] 
+% [argo1Struct, argo2Struct, argo3Struct, argo4Struct, WOA,NCEP, Work,goProg]
 %   = DOXY_inair_corr(CONFIG, WOA, NCEP, argo1Struct, argo2Struct, ...
 %   argo3Struct, argo4Struct, argo, argoWork, Work, argoTrajWork)
 %
 % DESCRIPTION
-% copy of DOXY_inair_corr function : Prepare INAIR data : 
+% copy of DOXY_inair_corr function : Prepare INAIR data :
 % * Colocalize NCEP data over the argo time, lat, lon for InAir data
 %
 % INPUT
@@ -33,9 +33,9 @@
 %                              coloc: [1x1 struct]
 %                          NCEP.init
 %                             nodata: 0
-%                                slp: [1×1 struct]
-%                                air: [1×1 struct]
-%                               rhum: [1×1 struct]
+%                                slp: [1x1 struct]
+%                                air: [1x1 struct]
+%                               rhum: [1x1 struct]
 %                                           ...
 %   argo1Struct (struct)    Three data structures organised as the main profile
 %   argo2Struct (struct)    for working is in argo1Struct (vertical
@@ -71,7 +71,7 @@
 %                                  DOXY_QC: [85x120 char]
 %
 %    argowork (structure)  Float working structure issued from the argo data
-%                         argoWork = 
+%                         argoWork =
 %                             pres_adjusted: [1x1 struct]
 %                             temp_adjusted: [1x1 struct]
 %                             psal_adjusted: [1x1 struct]
@@ -103,9 +103,9 @@
 %    goProg (double)       0\1. If this index is 0, LOCODOX stop the
 %                          treatment in progress
 %
-% CALL : 
-% DOXY_NCEP_colocalize, DOXY_interp_WOA_main, DOXY_interp_REF_main, 
-% DOXY_get_primary_PTS_for_traj, DOXY_get_profile_temp_for_traj, 
+% CALL :
+% DOXY_NCEP_colocalize, DOXY_interp_WOA_main, DOXY_interp_REF_main,
+% DOXY_get_primary_PTS_for_traj, DOXY_get_profile_temp_for_traj,
 % DOXY_drift, DOXY_corr_compute, DOXY_corr_apply_main,
 %
 % SEE ALSO
@@ -142,11 +142,11 @@ if argo2Struct.argo.n_prof ~= 0
             argo2Struct.Work.makePlot=1;
         end
         [~, argo2Struct.Work] = DOXY_interp_WOA_main(CONFIG.maskFile, CONFIG.varMask, argo2Struct.argo, WOA.init, ...
-        argo2Struct.argoWork, argo2Struct.Work);
+            argo2Struct.argoWork, argo2Struct.Work);
         argo2Struct.Work.makePlot=0;
     else
         [~, argo2Struct.Work] = DOXY_interp_WOA_main(CONFIG.maskFile, CONFIG.varMask, argo2Struct.argo, WOA.init, ...
-        argo2Struct.argoWork, argo2Struct.Work);
+            argo2Struct.argoWork, argo2Struct.Work);
     end
 end
 if argo3Struct.argo.n_prof ~= 0
@@ -216,13 +216,15 @@ for icycle = 1:length(argoTrajWork.cycle_number.data)
         % set psal_adjusted to the primary profil value
         if any(okCyc)
             idx = find(~isnan(argoWork.doxy_adjusted.data(okCyc,:)),1,'first');
-            argoTrajWork.profile.doxy_adjusted.data(icycle) = argoWork.doxy_adjusted.data(okCyc,idx);
-            argoTrajWork.profile.doxy_adjusted.pres(icycle) = argoWork.pres_adjusted.data(okCyc,idx);
-            argoTrajWork.profile.doxy_adjusted.cycle_number(icycle) = argo.cycle_number.data(okCyc);
-            argoTrajWork.profile.doxy_adjusted.juld(icycle) = argo.juld.data(okCyc);
-            if ~isempty(argoTrajWork.ppox_doxy_adjusted.data{icycle})
-                argoTrajWork.profile.cellShape.doxy_adjusted.data{icycle} = repmat(argoWork.doxy_adjusted.data(okCyc,idx),size(argoTrajWork.temp_adjusted.data{icycle}));
-                argoTrajWork.profile.cellShape.doxy_adjusted.juld{icycle} = repmat(argo.juld.data(okCyc),size(argoTrajWork.temp_adjusted.data{icycle}));
+            if ~isempty(idx) % Added by T. Reynaud 08.11.2020 for bug float 6902868
+                argoTrajWork.profile.doxy_adjusted.data(icycle) = argoWork.doxy_adjusted.data(okCyc,idx);
+                argoTrajWork.profile.doxy_adjusted.pres(icycle) = argoWork.pres_adjusted.data(okCyc,idx);
+                argoTrajWork.profile.doxy_adjusted.cycle_number(icycle) = argo.cycle_number.data(okCyc);
+                argoTrajWork.profile.doxy_adjusted.juld(icycle) = argo.juld.data(okCyc);
+                if ~isempty(argoTrajWork.ppox_doxy_adjusted.data{icycle})
+                    argoTrajWork.profile.cellShape.doxy_adjusted.data{icycle} = repmat(argoWork.doxy_adjusted.data(okCyc,idx),size(argoTrajWork.temp_adjusted.data{icycle}));
+                    argoTrajWork.profile.cellShape.doxy_adjusted.juld{icycle} = repmat(argo.juld.data(okCyc),size(argoTrajWork.temp_adjusted.data{icycle}));
+                end
             end
         end
     end
@@ -271,7 +273,7 @@ if Work.NSIAfloat
     for icycle = 1:length(argoTrajWork.cycle_number.data)
         isInWater = ismember(argoTrajWork.measurement_code.data{icycle},CONFIG.inWaterMC);
         nbr_inWater=length(find(isInWater==1));
-        Work.surface.argo.sss{icycle} = repmat(argoTrajWork.profile.psal_adjusted.data(icycle),1,nbr_inWater); 
+        Work.surface.argo.sss{icycle} = repmat(argoTrajWork.profile.psal_adjusted.data(icycle),1,nbr_inWater);
     end
 end
 tmpField = fieldnames(Work.surface.argo);
